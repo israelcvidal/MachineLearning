@@ -15,20 +15,18 @@ def predict(x, coefficients):
 
 def sgd(train, alpha, epochs):
     error_history = []
-    w_ = [1.0 for _ in range(len(train[0]))]
-    x_ = [row[:-1] for row in list(train)]
-    y_ = [row[-1] for row in train]
+    w_ = [0.0 for _ in range(len(train[0]))]
 
     for epoch in range(epochs):
-        # x_, y_ = shuffle(x_, y_)
+        # train = shuffle(train)
 
         epoch_error = []
-        for x__, y__ in zip(x_, y_):
-            error = y__ - predict(x__, w_)
+        for row in train:
+            error = row[-1] - predict(row[:-1], w_)
             epoch_error.append(error**2)
             w_[0] += (alpha*error)
-            for i in range(len(x__)):
-                w_[i + 1] += (alpha * error * x__[i])
+            for i in range(len(row) - 1):
+                w_[i + 1] += (alpha * error * row[i])
 
         error_history.append(sum(epoch_error)/len(epoch_error))
     return w_, error_history
@@ -36,28 +34,42 @@ def sgd(train, alpha, epochs):
 if __name__ == '__main__':
     alpha = 0.001
     epochs = 1000
+
+    # dataset1:
     data = np.loadtxt("data/ex1data1.txt", delimiter=',')
 
-    x = data[:, 0]
-    y = data[:, 1]
-    # for i in x:
-    #     print(i)
-    plt.plot(x, y, "ko")
-    p0 = [0, 0]
-    p1 = [-3.8465808694666443, 1.1507969424916813]
-    plt.plot(0, 0, -3.8465808694666443, 1.1507969424916813, 'ro')
-    plt.show()
-    # plt.savefig('results/plot')
-    w, epoch_errors = sgd(train=data, alpha=alpha, epochs=epochs)
-    # print(sum(epoch_errors)/len(epoch_errors))
-    # print(w)
-    # plt.plot([i for i in range(0, epochs)], epoch_errors)
-    # plt.show()
-
-
-    # data = np.loadtxt("data/ex1data2.txt")
-    # w, epoch_errors = sgd(train=data, alpha=alpha, epochs=epochs)
-    # print(w)
+    # # plot dataset1:
+    # x = data[:, 0]
+    # y = data[:, 1]
+    # plt.plot(x, y, "ko")
+    # # plt.show()
     #
+    # # save plot1:
+    # plt.savefig('results/plot')
+
+    # # run sgd for dataset1:
+    # w, epoch_errors = sgd(train=data, alpha=alpha, epochs=epochs)
+    #
+    # # show results for dataset1:
+    # print("w: " + str(w))
     # plt.plot([i for i in range(0, epochs)], epoch_errors)
+    # # plt.show()
+    #
+    # #save results for dataset1
+    # plt.savefig('results/epochs_mse_dataset')
+
+
+    #################################################
+
+
+    # dataset2:
+    data2 = np.loadtxt("data/ex1data2.txt")
+    w, epoch_errors = sgd(train=data2, alpha=alpha, epochs=epochs)
+
+    # show results for dataset2:
+    print("w: " + str(w))
+    plt.plot([i for i in range(0, epochs)], epoch_errors)
     # plt.show()
+
+    # save results for dataset2
+    plt.savefig('results/epochs_mse_dataset2_without_shuffle')
