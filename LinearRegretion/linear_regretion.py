@@ -1,6 +1,4 @@
 import matplotlib.pyplot as plt
-from math import sqrt
-import threading
 import numpy as np
 from sklearn.utils import shuffle
 
@@ -28,7 +26,7 @@ def sgd(train, alpha, epochs):
             for i in range(len(row) - 1):
                 w_[i + 1] += (alpha * error * row[i])
 
-        error_history.append(sum(epoch_error)/len(epoch_error))
+        error_history.append(sum(epoch_error)/2*len(epoch_error))
     return w_, error_history
 
 if __name__ == '__main__':
