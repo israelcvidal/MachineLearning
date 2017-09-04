@@ -1,7 +1,0 @@
-1. Um modelo de regressão linear parece ser adequado para os dados em questão? Comente.
-    * Sim, um modelo de regressão linear parece adequado, pois, pelo plot, parece existir uma reta que que aproxima a função original minimizando o erro.
-
-2. Valor final dos coeficientes e gráfico épocas x EQM.
-    * w0= -0.132819480149 w1 = 2.33887350509
-
-    * Sim, através do gráfico epoch x mse podemos observar que o algoritmo está aprendendo. No entando, também é possível observar que grande parte do aprendizado ocorre nas 50 épocas iniciais, melhorando pouquíssimo após isso.
