@@ -59,56 +59,94 @@ def regularized_least_squares(X, y, lambda_):
 
 
 def mse(real, predicted):
-    error = 0
+    error_ = 0
     for i, j in zip(real, predicted):
-        error += (i-j)**2
-    return error/(2*len(real))
+        error_ += (i-j)**2
+    return error_/(2*len(real))
+
+
+def k_fold(data_, alpha_, epochs_, k):
+    fold_size = int(len(data_)/k)
+
+    folds = [data_[i*fold_size: (i+1)*fold_size, :] for i in range(k)]
+    ws_ = []
+    error_ = []
+    for i in range(len(folds)):
+        test_ = folds[i]
+        train_ = []
+        for k in np.array([x for j, x in enumerate(folds) if j != i]):
+            train_.extend(k)
+
+        w_, _ = sgd(train_, alpha_, epochs_)
+        predicted_test = [logistic_predict(x, w_) for x in test_[:, :-1]]
+        test_error = mse(test_[:, -1], predicted_test)
+        ws_.append(w_)
+        error_.append(test_error)
+
+    return ws_, sum(error_)/len(error_)
+
+
+def plot_data(data_, save=False):
+    x = data_[:, :-1]
+    y = data_[:, -1]
+    colors = ['#1b9e77', '#d95f02']
+    plt.scatter(x[:, 0], x[:, 1], c=y, cmap=matplotlib.colors.ListedColormap(colors), s=50)
+    if save:
+        plt.savefig('results/plot_data_1')
+    else:
+        plt.show()
+
+    plt.close()
+
+
+def plot_epochs_error(epochs_, epoch_errors, save=False):
+    plt.plot([i for i in range(0, epochs_)], epoch_errors)
+    if save:
+        plt.savefig('results/epochs_mse_dataset1')
+    else:
+        plt.show()
+    plt.close()
+
 
 if __name__ == '__main__':
     data_1 = np.loadtxt("data/ex2data1.txt", delimiter=",")
-    normalize(data_1[:-1], axis=0, copy=False)
-    train = data_1[:int(len(data_1)*0.7)]
-    test = data_1[int(len(data_1)*0.7):]
-    alpha = 0.01
-    epochs = 1000
 
     # # plot dataset1:
-    # x = data_1[:, :-1]
-    # y = data_1[:, -1]
-    # colors = ['#1b9e77', '#d95f02']
-    # plt.scatter(x[:, 0], x[:, 1], c=y, cmap=matplotlib.colors.ListedColormap(colors), s=50)
-    # # plt.show()
-    #
-    # # save plot1:
-    # plt.savefig('results/plot_data_1')
-    # plt.close()
+    # plot_data(data_1)
 
-
-
+    normalize(data_1[:-1], axis=0, copy=False)
+    train = data_1[:int(len(data_1) * 0.7)]
+    test = data_1[int(len(data_1) * 0.7):]
+    alpha = 0.01
+    epochs = 1000
 
     # # run logistic refression for dataset1:
     # w, epoch_errors = sgd(train_=data_1, alpha_=alpha, epochs_=epochs)
     #
     # # show results for dataset1:
     # print("w: " + str(w))
-    # plt.plot([i for i in range(0, epochs)], epoch_errors)
-    # # # plt.show()
-    # #
-    # # # save results for dataset1
-    # plt.savefig('results/epochs_mse_dataset1')
-    # plt.close()
-    #
+    # plot_epochs_error(epochs, epoch_errors, save=False):
     # predicted_test = [logistic_predict(x, w) for x in test[:, :-1]]
     # test_error = mse(test[:, -1], predicted_test)
     # print("test error: ", test_error)
-
-
-
-
-
-
+    # ws, error = k_fold(data_1, alpha_=alpha, epochs_=epochs, k=5)
+    # for i, w in enumerate(ws):
+    #     print("w"+str(i)+": ", w)
+    # print(error)
 
     #################################################
 
+    data_2 = np.loadtxt("data/ex2data2.txt", delimiter=",")
 
+    plot_data(data_2)
+    #
+    # # save plot1:
+    # plt.savefig('results/plot_data_2')
+    # plt.close()
+
+    normalize(data_2[:-1], axis=0, copy=False)
+    train = data_2[:int(len(data_2) * 0.7)]
+    test = data_2[int(len(data_2) * 0.7):]
+    alpha = 0.01
+    epochs = 1000
 
