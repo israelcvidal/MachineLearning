@@ -21,7 +21,7 @@ def logistic_predict(x, coefficients):
 
 def sgd(train_, alpha_, epochs_):
     error_history = []
-    w_ = [random.random()*20 for _ in range(len(train_[0]))]
+    w_ = [random.random() for _ in range(len(train_[0]))]
 
     for epoch in range(epochs_):
         train_ = shuffle(train_)
@@ -47,15 +47,23 @@ def least_squares(X, y):
     return np.linalg.inv(x_.transpose().dot(x_)).dot(x_.transpose()).dot(y_.transpose())
 
 
-def regularized_least_squares(X, y, lambda_):
-    # calculate the least square
-    shape_ = np.matrix(X).shape
-    x_ = np.ones((shape_[0], shape_[1] + 1))
-    x_[:, 1:] = X
-    y_ = np.matrix(y)
-    lambda_identity = lambda_ * np.identity(shape_[1] + 1)
-    lambda_identity[0, 0] = 0
-    return np.linalg.inv(x_.transpose().dot(x_) + lambda_identity).dot(x_.transpose()).dot(y_.transpose())
+def sgd_regularized(train_, alpha_, epochs_, lambda_):
+    error_history = []
+    w_ = [random.random() for _ in range(len(train_[0]))]
+
+    for epoch in range(epochs_):
+        train_ = shuffle(train_)
+
+        epoch_error = []
+        for row in train_:
+            error = row[-1] - logistic_predict(row[:-1], w_)
+            epoch_error.append(error**2)
+            w_[0] += (alpha_ * error * row[0])
+            for i in range(len(row) - 1):
+                w_[i + 1] += alpha_ * ((error * row[i]) - lambda_*w_[i+1])
+
+        error_history.append(sum(epoch_error)/(2*len(epoch_error)))
+    return w_, error_history
 
 
 def mse(real, predicted):
@@ -90,16 +98,16 @@ def plot_data(data_, save=False):
     x = data_[:, :-1]
     y = data_[:, -1]
     colors = ['#1b9e77', '#d95f02']
-    plt.scatter(x[:, 0], x[:, 1], c=y, cmap=matplotlib.colors.ListedColormap(colors), s=50)
+    plt.scatter(x[:, 0], x[:, 1], c=y, cmap=matplotlib.colors.ListedColormap(colors), s=30)
     if save:
-        plt.savefig('results/plot_data_1')
+        plt.savefig('results/' + save)
     else:
         plt.show()
 
     plt.close()
 
 
-def plot_epochs_error(epochs_, epoch_errors, save=False):
+def plot_epochs_error(epochs_, epoch_errors, save=None):
     plt.plot([i for i in range(0, epochs_)], epoch_errors)
     if save:
         plt.savefig('results/epochs_mse_dataset1')
@@ -136,17 +144,16 @@ if __name__ == '__main__':
 
     #################################################
 
-    data_2 = np.loadtxt("data/ex2data2.txt", delimiter=",")
+    data_2 = np.loadtxt("data/dataset_mapfeature.txt", delimiter=",")
+    # plot_data(data_2)
 
-    plot_data(data_2)
-    #
-    # # save plot1:
-    # plt.savefig('results/plot_data_2')
-    # plt.close()
+    # normalize(data_2[:-1], axis=0, copy=False)
+    # train = data_2[:int(len(data_2) * 0.7)]
+    # test = data_2[int(len(data_2) * 0.7):]
+    # alpha = 0.01
+    # epochs = 1000
 
-    normalize(data_2[:-1], axis=0, copy=False)
-    train = data_2[:int(len(data_2) * 0.7)]
-    test = data_2[int(len(data_2) * 0.7):]
-    alpha = 0.01
-    epochs = 1000
-
+    mse_dataset = []
+    for lambda_ in [0, 0.01, 0.25]:
+        W, _ = sgd_regularized(data_2[:, :-1], alpha, epochs, lambda_)
+        print(W)
