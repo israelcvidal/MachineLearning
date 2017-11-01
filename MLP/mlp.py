@@ -2,22 +2,13 @@ import numpy as np
 from sklearn.utils import shuffle
 from scipy.io import loadmat
 
+
 def sigmoid(scores):
     return 1 / (1 + np.exp(-scores))
 
 
 def d_sigmoid(x):
     return x * (1 - x)
-#
-# def predict(x, wih, who):
-#     # The input to the hidden layer is the weights (wih) multiplied by inputs
-#     hidden_inputs = np.dot(wih, x)
-#     # The outputs of the hidden layer pass through sigmoid activation function
-#     hidden_outputs = sigmoid(hidden_inputs)
-#     # The input to the output layer is the weights (who) multiplied by hidden layer
-#     output_inputs = np.dot(who, hidden_outputs)
-#     outputs = sigmoid(output_inputs)
-#     return outputs
 
 
 class NeuralNetwork(object):
@@ -40,7 +31,7 @@ class NeuralNetwork(object):
             epoch_error = []
 
             # The input to the hidden layer is the weights (wih) multiplied by inputs
-            hidden_inputs = np.dot(self.wih, train_[:, :-1])
+            hidden_inputs = np.dot(self.wih, x_train)
             # The outputs of the hidden layer pass through sigmoid activation function
             hidden_outputs = sigmoid(hidden_inputs)
             # The input to the output layer is the weights (who) multiplied by hidden layer
@@ -53,14 +44,14 @@ class NeuralNetwork(object):
 
             epoch_error.append(errors ** 2)
 
-            # Now we are starting back propogation!
+            # Now we are starting back propagation!
 
             # Transpose hidden <-> output weights
             who_t = self.who.transpose()
             # Hidden errors is output errors multiplied by weights (who)
             hidden_errors = np.dot(who_t, errors)
 
-            # Calculate the gradient, this is much nicer in python!
+            # Calculate the gradient
             gradient_output = d_sigmoid(outputs)*errors
 
             # Gradients for next layer, more back propogation!
@@ -82,9 +73,9 @@ class NeuralNetwork(object):
 
 
 def main():
-    data = loadmat("data/DadosExemplo.mat")
-    x = data.get('x')
-    y = data.get('y')
+    data = loadmat("data/ex3data1.mat")
+    x = data.get('X')
+    y = data.get('T')
 
     print(x.shape, y.shape)
 
