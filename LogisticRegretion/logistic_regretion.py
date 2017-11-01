@@ -26,8 +26,7 @@ def logistic_predict(x, coefficients, label=False):
 
 def sgd(train_, alpha_, epochs_):
     error_history = []
-    # w_ = [random.random() for _ in range(len(train_[0]))]
-    w_ = [0 for _ in range(len(train_[0]))]
+    w_ = [random.random() for _ in range(len(train_[0]))]
 
     for epoch in range(epochs_):
         train_ = shuffle(train_)
@@ -55,7 +54,7 @@ def least_squares(X, y):
 
 def sgd_regularized(train_, alpha_, epochs_, lambda_):
     error_history = []
-    w_ = [0 for _ in range(len(train_[0]))]
+    w_ = [random.random() for _ in range(len(train_[0]))]
 
     for epoch in range(epochs_):
         train_ = shuffle(train_)
@@ -167,8 +166,6 @@ def question_2():
 def main():
     question_1()
     question_2()
-
-    #################################################
 
 
 if __name__ == '__main__':

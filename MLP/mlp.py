@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.utils import shuffle
-
+from scipy.io import loadmat
 
 def sigmoid(scores):
     return 1 / (1 + np.exp(-scores))
@@ -8,6 +8,16 @@ def sigmoid(scores):
 
 def d_sigmoid(x):
     return x * (1 - x)
+#
+# def predict(x, wih, who):
+#     # The input to the hidden layer is the weights (wih) multiplied by inputs
+#     hidden_inputs = np.dot(wih, x)
+#     # The outputs of the hidden layer pass through sigmoid activation function
+#     hidden_outputs = sigmoid(hidden_inputs)
+#     # The input to the output layer is the weights (who) multiplied by hidden layer
+#     output_inputs = np.dot(who, hidden_outputs)
+#     outputs = sigmoid(output_inputs)
+#     return outputs
 
 
 class NeuralNetwork(object):
@@ -40,7 +50,7 @@ class NeuralNetwork(object):
                 outputs = sigmoid(output_inputs)
 
                 # Error is TARGET - OUTPUT
-                error = train_[-1] - outputs
+                error = row[-1] - outputs
 
                 epoch_error.append(error ** 2)
 
@@ -54,37 +64,33 @@ class NeuralNetwork(object):
                 # Calculate the gradient, this is much nicer in python!
                 gradient_output = d_sigmoid(outputs)*error
 
-
-
-
-
-
-
-
-
-                # // Gradients for next layer, more back propogation!
-                var gradient_hidden = Matrix.map(hidden_outputs, this.derivative);
-                # // Weight by errors and learning rate
-                gradient_hidden.multiply(hidden_errors);
-                gradient_hidden.multiply(this.lr);
+                # Gradients for next layer, more back propogation!
+                # Weight by errors and learning rate
+                gradient_hidden = d_sigmoid(hidden_outputs)*hidden_errors*self.learning_rate
 
                 # // Change in weights from HIDDEN --> OUTPUT
-                var hidden_outputs_T = hidden_outputs.transpose();
-                var deltaW_output = Matrix.dot(gradient_output, hidden_outputs_T);
-                this.who.add(deltaW_output);
+                hidden_outputs_t = hidden_outputs.transpose()
+                delta_w_output = np.dot(gradient_output, hidden_outputs_t)
+                self.who = self.who + delta_w_output
 
                 # // Change in weights from INPUT --> HIDDEN
-                var inputs_T = inputs.transpose();
-                var deltaW_hidden = Matrix.dot(gradient_hidden, inputs_T);
-                this.wih.add(deltaW_hidden);
-
-
-                w_[0] += (alpha_ * error)
-                for i in range(len(row) - 1):
-                    w_[i + 1] += (alpha_ * error * row[i])
+                inputs_t = row.transpose()
+                delta_w_hidden = np.dot(gradient_hidden, inputs_t)
+                self.wih = self.wih + delta_w_hidden
 
             error_history.append(sum(epoch_error) / len(epoch_error))
-        return w_, error_history
+        return self.wih, self.who, error_history
 
+
+def main():
+    data = loadmat("data/DadosExemplo.mat")
+    x = data.get('x')
+    y = data.get('y')
+
+    print(x.shape, y.shape)
+
+
+if __name__ == '__main__':
+    main()
 
 
