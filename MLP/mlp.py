@@ -22,11 +22,10 @@ class NeuralNetwork(object):
         self.who = np.random.rand(n_output, n_hidden)
 
     def fit(self, x_train, y_train):
-        x_train = np.concatenate(([[-1] for _ in range(len(x_train))], x_train))
+        # x_train = np.concatenate(([[-1] for _ in range(len(x_train))], x_train), axis=1)
         error_history = []
 
         for epoch in range(self.n_epochs):
-            x_train, y_train = shuffle(x_train, y_train)
 
             epoch_error = []
 
@@ -43,7 +42,7 @@ class NeuralNetwork(object):
             errors = y_train - outputs
 
             epoch_error.append(errors ** 2)
-
+            print(errors**2)
             # Now we are starting back propagation!
 
             # Transpose hidden <-> output weights
@@ -54,30 +53,42 @@ class NeuralNetwork(object):
             # Calculate the gradient
             gradient_output = d_sigmoid(outputs)*errors
 
-            # Gradients for next layer, more back propogation!
+            # Gradients for next layer, more back propagation!
             # Weight by errors and learning rate
-            gradient_hidden = d_sigmoid(hidden_outputs)*hidden_errors*self.learning_rate
+            gradient_hidden = d_sigmoid(hidden_outputs)*hidden_errors
 
             # // Change in weights from HIDDEN --> OUTPUT
             hidden_outputs_t = hidden_outputs.transpose()
             delta_w_output = np.dot(gradient_output, hidden_outputs_t)
-            self.who = self.who + delta_w_output
+            self.who = self.who + (self.learning_rate*delta_w_output)
 
             # // Change in weights from INPUT --> HIDDEN
             inputs_t = x_train.transpose()
             delta_w_hidden = np.dot(gradient_hidden, inputs_t)
-            self.wih = self.wih + delta_w_hidden
+            self.wih = self.wih + (self.learning_rate*delta_w_hidden)
 
             error_history.append(sum(epoch_error) / len(epoch_error))
-        return self.wih, self.who, error_history
-
+        # return self.wih, self.who, error_history
+        return error_history
 
 def main():
     data = loadmat("data/ex3data1.mat")
-    x = data.get('X')
-    y = data.get('T')
+    x = data.get('X').transpose()
+    y = data.get('T').transpose()
+    print(x.shape)
+    print(y.shape)
+    nn = NeuralNetwork(400, 10, 10, 300, 0.01)
+    nn.fit(x, y)
 
-    print(x.shape, y.shape)
+
+    # data = loadmat("data/DadosExemplo.mat")
+    # x = data.get("x").transpose()
+    # y = data.get("y")
+
+    # nn = NeuralNetwork(2, 2, 2, 300, 0.01)
+    # nn.fit(x, y)
+    # print(nn.fit(x, y))
+    # print(x.shape, y.shape)
 
 
 if __name__ == '__main__':
