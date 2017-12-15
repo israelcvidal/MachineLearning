@@ -41,8 +41,9 @@ class NeuralNetwork(object):
             # Error is TARGET - OUTPUT
             errors = y_train - outputs
 
-            epoch_error.append(errors ** 2)
+            epoch_error.append(sum(errors ** 2)/len(errors))
             print(errors**2)
+            # print(sum(errors**2)/len(errors))
             # Now we are starting back propagation!
 
             # Transpose hidden <-> output weights
@@ -69,21 +70,22 @@ class NeuralNetwork(object):
 
             error_history.append(sum(epoch_error) / len(epoch_error))
         # return self.wih, self.who, error_history
+        print(self.wih.shape)
         return error_history
 
 def main():
     data = loadmat("data/ex3data1.mat")
     x = data.get('X').transpose()
     y = data.get('T').transpose()
-    print(x.shape)
-    print(y.shape)
-    nn = NeuralNetwork(400, 50, 10, 300, 0.05)
+
+    # print(x.shape)
+    # print(y.shape)
+    nn = NeuralNetwork(400, 10, 10, 300, 0.01)
     nn.fit(x, y)
 
-
-    # data = loadmat("data/DadosExemplo.mat")
-    # x = data.get("x").transpose()
-    # y = data.get("y")
+    data = loadmat("data/DadosExemplo.mat")
+    x = data.get("x").transpose()
+    y = data.get("y")
 
     # nn = NeuralNetwork(2, 2, 2, 300, 0.01)
     # nn.fit(x, y)
