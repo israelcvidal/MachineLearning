@@ -77,7 +77,7 @@ def main():
     y = data.get('T').transpose()
     print(x.shape)
     print(y.shape)
-    nn = NeuralNetwork(400, 10, 10, 300, 0.01)
+    nn = NeuralNetwork(400, 50, 10, 300, 0.05)
     nn.fit(x, y)
 
 
